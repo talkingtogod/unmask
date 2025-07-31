@@ -13,7 +13,6 @@ except ImportError:
     subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pystyle'])
     from pystyle import Colors, Colorate, Center, Write, Box, System
 
-
 def check_and_install_packages(packages):
     Write.Print("\n" + "═" * 50 + "\n", Colors.red_to_blue, interval=0.01)
     Write.Print("   CHECKING REQUIREMENTS\n",
@@ -38,16 +37,13 @@ def check_and_install_packages(packages):
                         Colors.light_green,
                         interval=0.01)
 
-
 def get_file_path(prompt_text):
     completer = PathCompleter()
     colored_prompt = prompt_text
     return prompt(colored_prompt, completer=completer).strip()
 
-
 def clear_screen():
     System.Clear()
-
 
 def loading_dots(text, duration=3):
     end_time = time.time() + duration
@@ -62,14 +58,12 @@ def loading_dots(text, duration=3):
             time.sleep(0.3)
     print(f"\r{' ' * (len(text) + 10)}\r", end="")
 
-
 def progress_bar(current, total, width=50):
     percent = int((current / total) * 100)
     filled = int((current / total) * width)
     bar = "█" * filled + "░" * (width - filled)
     progress_text = f"[{bar}] {percent}% ({current}/{total})"
     return Colorate.Horizontal(Colors.red_to_blue, progress_text)
-
 
 def get_random_user_agent():
     user_agents = [
@@ -83,7 +77,6 @@ def get_random_user_agent():
 
 
 class GitHubEmailExtractor:
-
     def __init__(self, username):
         self.username = username
         self.base_url = "https://api.github.com"
@@ -241,7 +234,6 @@ class GitHubEmailExtractor:
                 for email, sources in email_sources.items()
                 if not email.endswith('@users.noreply.github.com')
             }
-
         if user_specific:
             email_sources = {
                 email: sources
@@ -269,7 +261,6 @@ def get_user_input(prompt_text, default_value):
             clear_screen()
             banner()
 
-
 def banner():
     banner_text = """
 ██╗   ██╗███╗   ██╗███╗   ███╗ █████╗ ███████╗██╗  ██╗
@@ -290,8 +281,6 @@ def banner():
 def create_box_simple(title, content):
     """Create a simple box display"""
     width = 78
-
-    # Box content
     box_content = f"""
 ╔{'═' * width}╗
 ║{title.center(width)}║
@@ -350,29 +339,22 @@ def display_emails(emails):
         Write.Print("─" * len(email_header) + "\n",
                     Colors.red_to_blue,
                     interval=0.01)
-
-        # Sources
         for j, source in enumerate(sources, 1):
             source_text = f"  {j}. {source}"
             Write.Print(f"{source_text}\n",
                         Colors.cyan_to_blue,
                         interval=0.005)
-
         time.sleep(0.1)
-
     return email_count
-
 
 def main():
     clear_screen()
-
     # Check packages
     required_packages = {
         'requests': '2.28.1',
         'prompt_toolkit': '3.0.36',
         'pystyle': '2.9'
     }
-
     check_and_install_packages(required_packages)
     loading_dots("Initializing UNMASK", 2)
     clear_screen()
@@ -396,7 +378,6 @@ def main():
     extractor = GitHubEmailExtractor(username)
     if not extractor.user_exists():
         return
-
     clear_screen()
     banner()
 
@@ -440,7 +421,6 @@ def main():
     Write.Print("Starting GitHub analysis...\n",
                 Colors.red_to_blue,
                 interval=0.03)
-
     display_user_info(extractor, username)
 
     start_time = time.time()
@@ -508,10 +488,9 @@ def main():
                     Colors.light_green,
                     interval=0.02)
 
-    Write.Print("\nThank you for using UNMASK! Stay curious, stay ethical.\n",
+    Write.Print("\nThank you for using UNMASK! Stay curious, stay ethical. - @midlegg \n",
                 Colors.red_to_blue,
                 interval=0.02)
-
 
 if __name__ == "__main__":
     try:
@@ -526,3 +505,7 @@ if __name__ == "__main__":
                     Colors.light_red,
                     interval=0.03)
         sys.exit(1)
+
+
+# github - @talkingtogod
+# discord - @midlegg
