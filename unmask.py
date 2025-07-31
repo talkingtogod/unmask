@@ -13,27 +13,41 @@ except ImportError:
     subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pystyle'])
     from pystyle import Colors, Colorate, Center, Write, Box, System
 
+
 def check_and_install_packages(packages):
     Write.Print("\n" + "═" * 50 + "\n", Colors.red_to_blue, interval=0.01)
-    Write.Print("   CHECKING REQUIREMENTS\n", Colors.red_to_blue, interval=0.02)
+    Write.Print("   CHECKING REQUIREMENTS\n",
+                Colors.red_to_blue,
+                interval=0.02)
     Write.Print("═" * 50 + "\n", Colors.red_to_blue, interval=0.01)
 
     for package, version in packages.items():
         try:
             __import__(package)
-            Write.Print(f"[✓] {package} is already installed\n", Colors.light_green, interval=0.01)
+            Write.Print(f"[✓] {package} is already installed\n",
+                        Colors.light_green,
+                        interval=0.01)
         except ImportError:
-            Write.Print(f"[!] Installing {package}...\n", Colors.light_red, interval=0.02)
-            subprocess.check_call([sys.executable, '-m', 'pip', 'install', f"{package}=={version}"])
-            Write.Print(f"[✓] {package} installed successfully\n", Colors.light_green, interval=0.01)
+            Write.Print(f"[!] Installing {package}...\n",
+                        Colors.light_red,
+                        interval=0.02)
+            subprocess.check_call([
+                sys.executable, '-m', 'pip', 'install', f"{package}=={version}"
+            ])
+            Write.Print(f"[✓] {package} installed successfully\n",
+                        Colors.light_green,
+                        interval=0.01)
+
 
 def get_file_path(prompt_text):
     completer = PathCompleter()
-    colored_prompt = Colorate.Horizontal(Colors.red_to_blue, prompt_text)
+    colored_prompt = prompt_text
     return prompt(colored_prompt, completer=completer).strip()
+
 
 def clear_screen():
     System.Clear()
+
 
 def loading_dots(text, duration=3):
     end_time = time.time() + duration
@@ -41,9 +55,13 @@ def loading_dots(text, duration=3):
     while time.time() < end_time:
         for i in range(4):
             dots = "." * i
-            print(f"\r{Colorate.Horizontal(Colors.red_to_blue, f'{text}{dots}   ')}", end="", flush=True)
+            print(
+                f"\r{Colorate.Horizontal(Colors.red_to_blue, f'{text}{dots}   ')}",
+                end="",
+                flush=True)
             time.sleep(0.3)
     print(f"\r{' ' * (len(text) + 10)}\r", end="")
+
 
 def progress_bar(current, total, width=50):
     percent = int((current / total) * 100)
@@ -51,6 +69,7 @@ def progress_bar(current, total, width=50):
     bar = "█" * filled + "░" * (width - filled)
     progress_text = f"[{bar}] {percent}% ({current}/{total})"
     return Colorate.Horizontal(Colors.red_to_blue, progress_text)
+
 
 def get_random_user_agent():
     user_agents = [
@@ -62,7 +81,9 @@ def get_random_user_agent():
     ]
     return random.choice(user_agents)
 
+
 class GitHubEmailExtractor:
+
     def __init__(self, username):
         self.username = username
         self.base_url = "https://api.github.com"
@@ -71,7 +92,8 @@ class GitHubEmailExtractor:
 
     def user_exists(self):
         loading_dots("Checking user existence", 2)
-        response = requests.get(f"{self.base_url}/users/{self.username}", headers=self.headers)
+        response = requests.get(f"{self.base_url}/users/{self.username}",
+                                headers=self.headers)
 
         if response.status_code == 200:
             user_data = response.json()
@@ -90,36 +112,53 @@ class GitHubEmailExtractor:
                 'email': user_data.get('email', 'N/A'),
                 'public_repos': user_data.get('public_repos', 'N/A')
             }
-            Write.Print("[✓] User found successfully!\n", Colors.light_green, interval=0.02)
+            Write.Print("[✓] User found successfully!\n",
+                        Colors.light_green,
+                        interval=0.02)
             return True
         elif response.status_code == 404:
-            Write.Print("[✗] GitHub user does not exist\n", Colors.light_red, interval=0.03)
+            Write.Print("[✗] GitHub user does not exist\n",
+                        Colors.light_red,
+                        interval=0.03)
         elif response.status_code == 403:
-            Write.Print("[✗] GitHub API rate limit reached\n", Colors.light_red, interval=0.03)
+            Write.Print("[✗] GitHub API rate limit reached\n",
+                        Colors.light_red,
+                        interval=0.03)
             sys.exit(1)
         else:
-            Write.Print(f"[✗] Failed to retrieve user: {response.text}\n", Colors.light_red, interval=0.03)
+            Write.Print(f"[✗] Failed to retrieve user: {response.text}\n",
+                        Colors.light_red,
+                        interval=0.03)
 
         return False
 
     def get_repositories(self):
         loading_dots("Fetching repositories", 1)
-        response = requests.get(f"{self.base_url}/users/{self.username}/repos", headers=self.headers)
+        response = requests.get(f"{self.base_url}/users/{self.username}/repos",
+                                headers=self.headers)
 
         if response.status_code == 200:
             try:
                 repos = response.json()
-                Write.Print(f"[✓] Found {len(repos)} repositories\n", Colors.light_green, interval=0.02)
+                Write.Print(f"[✓] Found {len(repos)} repositories\n",
+                            Colors.light_green,
+                            interval=0.02)
                 return repos
             except ValueError:
-                Write.Print("[✗] Unexpected response format\n", Colors.light_red, interval=0.03)
+                Write.Print("[✗] Unexpected response format\n",
+                            Colors.light_red,
+                            interval=0.03)
                 return []
         else:
-            Write.Print("[✗] Failed to retrieve repositories\n", Colors.light_red, interval=0.03)
+            Write.Print("[✗] Failed to retrieve repositories\n",
+                        Colors.light_red,
+                        interval=0.03)
             return []
 
     def get_commits(self, repo):
-        response = requests.get(f"{self.base_url}/repos/{self.username}/{repo}/commits", headers=self.headers)
+        response = requests.get(
+            f"{self.base_url}/repos/{self.username}/{repo}/commits",
+            headers=self.headers)
         if response.status_code == 200:
             try:
                 return response.json()
@@ -129,12 +168,16 @@ class GitHubEmailExtractor:
 
     def get_public_events(self):
         loading_dots("Fetching public events", 1)
-        response = requests.get(f"{self.base_url}/users/{self.username}/events/public", headers=self.headers)
+        response = requests.get(
+            f"{self.base_url}/users/{self.username}/events/public",
+            headers=self.headers)
 
         if response.status_code == 200:
             try:
                 events = response.json()
-                Write.Print(f"[✓] Found {len(events)} public events\n", Colors.light_green, interval=0.02)
+                Write.Print(f"[✓] Found {len(events)} public events\n",
+                            Colors.light_green,
+                            interval=0.02)
                 return events
             except ValueError:
                 return []
@@ -144,7 +187,9 @@ class GitHubEmailExtractor:
         email_sources = {}
         repos = self.get_repositories()
 
-        Write.Print("\nScanning repositories for emails...\n", Colors.red_to_blue, interval=0.02)
+        Write.Print("\nScanning repositories for emails...\n",
+                    Colors.red_to_blue,
+                    interval=0.02)
 
         processed_repos = 0
         total_repos = len([r for r in repos if not r.get("fork")])
@@ -152,13 +197,17 @@ class GitHubEmailExtractor:
         for repo in repos:
             if not repo.get("fork"):
                 processed_repos += 1
-                print(f"\r{progress_bar(processed_repos, total_repos)}", end="", flush=True)
+                print(f"\r{progress_bar(processed_repos, total_repos)}",
+                      end="",
+                      flush=True)
 
                 try:
                     commits = self.get_commits(repo.get('name', ''))
                     for commit in commits:
                         if commit:
-                            email = commit.get('commit', {}).get('author', {}).get('email')
+                            email = commit.get('commit',
+                                               {}).get('author',
+                                                       {}).get('email')
                             if email:
                                 email_sources.setdefault(email, []).append(
                                     f"Repo: https://github.com/{self.username}/{repo['name']}, User: {commit.get('author', {}).get('login', 'unknown')}"
@@ -168,7 +217,9 @@ class GitHubEmailExtractor:
 
         print("\n")
 
-        Write.Print("Scanning public events...\n", Colors.red_to_blue, interval=0.02)
+        Write.Print("Scanning public events...\n",
+                    Colors.red_to_blue,
+                    interval=0.02)
         events = self.get_public_events()
 
         for event in events:
@@ -185,27 +236,39 @@ class GitHubEmailExtractor:
                     continue
 
         if not include_hidden:
-            email_sources = {email: sources for email, sources in email_sources.items() 
-                           if not email.endswith('@users.noreply.github.com')}
+            email_sources = {
+                email: sources
+                for email, sources in email_sources.items()
+                if not email.endswith('@users.noreply.github.com')
+            }
 
         if user_specific:
-            email_sources = {email: sources for email, sources in email_sources.items() 
-                           if any(f"User: {self.username}" in source for source in sources)}
+            email_sources = {
+                email: sources
+                for email, sources in email_sources.items() if any(
+                    f"User: {self.username}" in source for source in sources)
+            }
 
         return email_sources
 
+
 def get_user_input(prompt_text, default_value):
     while True:
-        colored_prompt = Colorate.Horizontal(Colors.red_to_blue, prompt_text)
+        colored_prompt = Colors.red + prompt_text + Colors.reset
         user_input = input(colored_prompt).strip().lower()
         if user_input in ['y', 'n', '']:
             return user_input if user_input else default_value
         else:
-            Write.Print("Invalid input. Please enter 'y' or 'n'\n", Colors.light_red, interval=0.03)
-            Write.Print("Press Enter to try again...\n", Colors.light_red, interval=0.02)
+            Write.Print("Invalid input. Please enter 'y' or 'n'\n",
+                        Colors.light_red,
+                        interval=0.03)
+            Write.Print("Press Enter to try again...\n",
+                        Colors.light_red,
+                        interval=0.02)
             input()
             clear_screen()
             banner()
+
 
 def banner():
     banner_text = """
@@ -222,6 +285,7 @@ def banner():
     subtitle = "Unmasking GitHub's Hidden Insights, One Repo at a Time"
     print(Center.XCenter(Colorate.Horizontal(Colors.cyan_to_green, subtitle)))
     print()
+
 
 def create_box_simple(title, content):
     """Create a simple box display"""
@@ -241,6 +305,7 @@ def create_box_simple(title, content):
     box_content += f"╚{'═' * width}╝"
 
     return Colorate.Horizontal(Colors.red_to_blue, box_content)
+
 
 def display_user_info(extractor, username):
     Write.Print("\n" + "═" * 50 + "\n", Colors.red_to_blue, interval=0.01)
@@ -265,28 +330,38 @@ def display_user_info(extractor, username):
 
     print(create_box_simple("USER PROFILE", info_lines))
 
+
 def display_emails(emails):
     if not emails:
-        Write.Print("\n[✗] No emails were found\n", Colors.light_red, interval=0.03)
+        Write.Print("\n[✗] No emails were found\n",
+                    Colors.light_red,
+                    interval=0.03)
         return 0
 
     email_count = len(emails)
-    Write.Print(f"\n[✓] Found {email_count} email address(es):\n", Colors.light_green, interval=0.03)
+    Write.Print(f"\n[✓] Found {email_count} email address(es):\n",
+                Colors.light_green,
+                interval=0.03)
 
     for i, (email, sources) in enumerate(emails.items(), 1):
         # Email header
         email_header = f"Email #{i}: {email}"
         Write.Print(f"\n{email_header}\n", Colors.red_to_blue, interval=0.01)
-        Write.Print("─" * len(email_header) + "\n", Colors.red_to_blue, interval=0.01)
+        Write.Print("─" * len(email_header) + "\n",
+                    Colors.red_to_blue,
+                    interval=0.01)
 
         # Sources
         for j, source in enumerate(sources, 1):
             source_text = f"  {j}. {source}"
-            Write.Print(f"{source_text}\n", Colors.cyan_to_blue, interval=0.005)
+            Write.Print(f"{source_text}\n",
+                        Colors.cyan_to_blue,
+                        interval=0.005)
 
         time.sleep(0.1)
 
     return email_count
+
 
 def main():
     clear_screen()
@@ -306,8 +381,12 @@ def main():
         banner()
         username = get_file_path("[?] Enter GitHub username: ")
         if not username:
-            Write.Print("\nUsername cannot be empty\n", Colors.light_red, interval=0.03)
-            Write.Print("Press Enter to try again...\n", Colors.light_red, interval=0.02)
+            Write.Print("\nUsername cannot be empty\n",
+                        Colors.light_red,
+                        interval=0.03)
+            Write.Print("Press Enter to try again...\n",
+                        Colors.light_red,
+                        interval=0.02)
             input()
             clear_screen()
             continue
@@ -323,25 +402,34 @@ def main():
 
     # Configuration menu
     config_content = [
-        "Choose your scanning preferences:",
-        "",
+        "Choose your scanning preferences:", "",
         "1. Quick Scan    - Default settings, faster results",
-        "2. Advanced Scan - Customizable options for detailed analysis",
-        ""
+        "2. Advanced Scan - Customizable options for detailed analysis", ""
     ]
 
     print(create_box_simple("SCAN CONFIGURATION", config_content))
 
-    scan_choice = input(Colorate.Horizontal(Colors.red_to_blue, "\n[?] Choose scan type (1/2, press Enter for 1): ")).strip()
+    scan_choice = input(
+        Colorate.Horizontal(
+            Colors.red_to_blue,
+            "\n[?] Choose scan type (1/2, press Enter for 1): ")).strip()
 
     if scan_choice == '2':
-        Write.Print("\nAdvanced Configuration:\n", Colors.red_to_blue, interval=0.03)
-        include_hidden = get_user_input("[?] Include hidden emails (@users.noreply.github.com)? (y/n, press Enter for y): ", 'y')
-        user_specific = get_user_input("[?] Filter emails by user activity? (y/n, press Enter for n): ", 'n')
+        Write.Print("\nAdvanced Configuration:\n",
+                    Colors.red_to_blue,
+                    interval=0.03)
+        include_hidden = get_user_input(
+            "[?] Include hidden emails (@users.noreply.github.com)? (y/n, press Enter for y): ",
+            'y')
+        user_specific = get_user_input(
+            "[?] Filter emails by user activity? (y/n, press Enter for n): ",
+            'n')
     else:
         include_hidden = 'y'
         user_specific = 'n'
-        Write.Print("\nUsing Quick Scan settings...\n", Colors.light_green, interval=0.03)
+        Write.Print("\nUsing Quick Scan settings...\n",
+                    Colors.light_green,
+                    interval=0.03)
 
     include_hidden = include_hidden == 'y'
     user_specific = user_specific == 'y'
@@ -349,7 +437,9 @@ def main():
     loading_dots("Preparing scan environment", 2)
     clear_screen()
 
-    Write.Print("Starting GitHub analysis...\n", Colors.red_to_blue, interval=0.03)
+    Write.Print("Starting GitHub analysis...\n",
+                Colors.red_to_blue,
+                interval=0.03)
 
     display_user_info(extractor, username)
 
@@ -365,8 +455,7 @@ def main():
     Write.Print("═" * 50 + "\n", Colors.red_to_blue, interval=0.01)
 
     summary_lines = [
-        f"Status          : COMPLETED ✓",
-        f"Emails Found    : {email_count}",
+        f"Status          : COMPLETED ✓", f"Emails Found    : {email_count}",
         f"Time Taken      : {elapsed_time} seconds",
         f"Target User     : {username}",
         f"Hidden Emails   : {'Included' if include_hidden else 'Excluded'}",
@@ -376,11 +465,15 @@ def main():
     print(create_box_simple("RESULTS", summary_lines))
 
     # Save results option
-    save_prompt = Colorate.Horizontal(Colors.red_to_blue, "\n[?] Save results to file? (y/n, press Enter for n): ")
+    save_prompt = Colorate.Horizontal(
+        Colors.red_to_blue,
+        "\n[?] Save results to file? (y/n, press Enter for n): ")
     save = input(save_prompt).lower()
 
     if save == 'y':
-        filename_prompt = Colorate.Horizontal(Colors.red_to_blue, "[?] Enter filename (press Enter for 'results.txt'): ")
+        filename_prompt = Colorate.Horizontal(
+            Colors.red_to_blue,
+            "[?] Enter filename (press Enter for 'results.txt'): ")
         filename = input(filename_prompt).strip()
         if not filename:
             filename = 'results.txt'
@@ -411,16 +504,25 @@ def main():
                 for j, source in enumerate(sources, 1):
                     f.write(f"  {j}. {source}\n")
 
-        Write.Print(f"[✓] Results saved to {filename}\n", Colors.light_green, interval=0.02)
+        Write.Print(f"[✓] Results saved to {filename}\n",
+                    Colors.light_green,
+                    interval=0.02)
 
-    Write.Print("\nThank you for using UNMASK! Stay curious, stay ethical.\n", Colors.red_to_blue, interval=0.02)
+    Write.Print("\nThank you for using UNMASK! Stay curious, stay ethical.\n",
+                Colors.red_to_blue,
+                interval=0.02)
+
 
 if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        Write.Print("\n\n[!] Program terminated by user. Goodbye!\n", Colors.light_red, interval=0.03)
+        Write.Print("\n\n[!] Program terminated by user. Goodbye!\n",
+                    Colors.light_red,
+                    interval=0.03)
         sys.exit(0)
     except Exception as e:
-        Write.Print(f"\n[!] An unexpected error occurred: {e}\n", Colors.light_red, interval=0.03)
+        Write.Print(f"\n[!] An unexpected error occurred: {e}\n",
+                    Colors.light_red,
+                    interval=0.03)
         sys.exit(1)
