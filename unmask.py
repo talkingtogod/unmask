@@ -305,7 +305,7 @@ def display_user_info(extractor, username):
         f"Username        : {username}",
         f"Name            : {extractor.user_info['name']}",
         f"Profile URL     : {extractor.user_info['html_url']}",
-        f"Bio             : {extractor.user_info['bio'][:60]}{'...' if len(extractor.user_info['bio']) > 60 else ''}",
+        f"Bio             : {(extractor.user_info['bio'] or 'No bio available')[:60]}{'...' if extractor.user_info['bio'] and len(extractor.user_info['bio']) > 60 else ''}",
         f"Email           : {extractor.user_info['email']}",
         f"Company         : {extractor.user_info['company']}",
         f"Location        : {extractor.user_info['location']}",
